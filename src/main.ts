@@ -81,15 +81,64 @@ let testTodo3 = new Todo("Gassi gehen xD", Priorities.High, projectTuesday);
 const projects = document.getElementById("projects");
 const todos = document.getElementById("todos");
 
-for (const project of Project.instances) {
-    const projectDiv = document.createElement("span");
-    projectDiv.classList = "m-1";
-    projectDiv.onclick = (event) => {
-        showTodos(project);
-    };
-    projectDiv.textContent = project.projectTitle;
-    projects?.appendChild(projectDiv);
-    //  + todo.description + todo.priority + todo.project + todo.creationDate
+function renderProjects() {
+    projects!.innerHTML = "";
+    for (const project of Project.instances) {
+        const projectDiv = document.createElement("span");
+        projectDiv.classList = "m-1";
+        projectDiv.onclick = (event) => {
+            showTodos(project);
+        };
+        projectDiv.textContent = project.projectTitle;
+        projects?.appendChild(projectDiv);
+        //  + todo.description + todo.priority + todo.project + todo.creationDate
+    }
+}
+
+function addProject() {
+    let newProject = prompt("Give your project a name", "Project XZ");
+    if (newProject != null) {
+        new Project(newProject);
+        renderProjects();
+    }
+}
+
+function addTodo() {
+    let todoForm = document.getElementById("todo-form");
+    let projectList = document.getElementById("project-dropdown");
+
+    for (const project of Project.instances) {
+        let projectElement = document.createElement("option");
+        projectElement.value = project.projectTitle;
+        projectElement.textContent = project.projectTitle;
+        projectList.appendChild(projectElement);
+    }
+    todoForm!.classList.replace("invisible", "visible");
+}
+
+function submitTodo() {
+    let todoForm = document.getElementById("todo-form");
+    todoForm!.classList.replace("visible", "invisible");
+    // save data logic here
+    saveTodo();
+    console.log("Submitted");
+}
+
+function saveTodo(){
+    const todoProject = (document.getElementById('project-dropdown') as HTMLSelectElement).value;
+    const todoPriority = (document.getElementById('priority-dropdown') as HTMLSelectElement).value;
+    const todoTitle = document.querySelector('input[name="title"]').value;
+    const todoDescription = document.querySelector('input[name="description"]').value;
+    console.log("Project: " + todoProject);
+    console.log("Priority: " + todoPriority);
+    console.log("Title: " + todoTitle);
+    console.log("Description: " + todoDescription);
+}
+
+function cancelTodo(){
+    let todoForm = document.getElementById("todo-form");
+    todoForm!.classList.replace("visible", "invisible");
+    console.log("Cancelled");
 }
 
 function showAllTodos() {
@@ -111,9 +160,12 @@ function showTodos(selectedProject: Project) {
 function displayTodo(todo: Todo) {
     const todoDiv = document.createElement("div");
     const singleTodo = document.createElement("p");
-    todoDiv.classList = "border border-red";
-    singleTodo.classList = "border border-white";
-    singleTodo.textContent = todo.todoTitle + todo.description + todo.priority;
+    singleTodo.textContent =
+        todo.todoTitle + (todo.description ?? "") + "Priority: " + Priorities[todo.priority];
     todos?.appendChild(singleTodo);
 }
+
+document.getElementById("submit-button")!.addEventListener('click', submitTodo);
+document.getElementById("cancel-button")!.addEventListener("click", cancelTodo);
+renderProjects();
 showAllTodos();

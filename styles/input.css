@@ -1,1 +1,12 @@
 @import "tailwindcss";
+
+input[type="text"],
+textarea {
+    background-color: #777777;
+    width: 100%;
+}
+
+div {
+    padding: 8px 8px 8px 8px;
+    border: 1px solid;
+}

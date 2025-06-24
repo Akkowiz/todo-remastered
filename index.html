@@ -8,16 +8,46 @@
         <title>To Do Remastered</title>
     </head>
     <body class="bg-gray-900 text-white">
+        <div
+            id="todo-form"
+            class="invisible z-20 absolute left-1/2 top-1/2 transform -translate-x-1/2 -translate-y-1/2 p-2 bg-gray-800"
+        >
+            Title: <input type="text" name="title" required /><br />
+            Description: <input type="text" name="description" /><br />
+            Priority:
+            <select name="priority-dropdown" id="priority-dropdown">
+                <option value="Low">Low</option>
+                <option value="Medium">Medium</option>
+                <option value="High">High</option>
+            </select>
+            <br />
+            <label for="project-dropdown">Project:</label>
+            <select name="project-dropdown" id="project-dropdown"></select>
+            <br />
+
+            <!-- <input type="radio" id="high" name="priority" value="High" required />
+            <label for="high">High</label><br />
+            <input type="radio" id="medium" name="priority" value="Medium" />
+            <label for="medium">Medium</label><br />
+            <input type="radio" id="low" name="priority" value="Low" />
+            <label for="low">Low</label><br /> -->
+            <button id="submit-button">Submit</button>
+            <button id="cancel-button">Cancel</button>
+        </div>
         <div class="grid grid-cols-12 gap-4 m-4">
             <h1 id="headline" class="col-start-1 col-span-4 text-2xl">To Do Remastered</h1>
-            <div id="projects" class="col-start-5 col-span-full border border-white p-2">
-                <button class="bg-white text-black rounded m-1" onclick="alert('xD')">
+            <div class="-white p-2 col-start-5 col-span-full">
+                <button class="bg-white text-black rounded m-1" onclick="addProject()">
                     Add Project
                 </button>
+                <button class="bg-white text-black rounded m-1" onclick="addTodo()">
+                    Add Todo WIP
+                </button>
                 <span id="all-projects" onclick="showAllTodos()">Alle Projekte</span>
+                <div id="projects" class=""></div>
             </div>
         </div>
-        <div id="todos" class="grid grid-cols-4 border gap-4 m-4 border-white">
+        <div id="todos" class="grid grid-cols-4 gap-4 m-4">
             <!-- TODOS will load here -->
         </div>
     </body>
