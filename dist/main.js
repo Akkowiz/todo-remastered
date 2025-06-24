@@ -28,7 +28,7 @@ class Todo {
         this.priority = priority;
         this.creationDate = new Date();
         this.status = false;
-        (this.project = project !== null && project !== void 0 ? project : defaultProject).addTodo(this);
+        this.project = project !== null && project !== void 0 ? project : defaultProject;
         this.description = description;
     }
 }
@@ -68,6 +68,7 @@ function addProject() {
 function addTodo() {
     let todoForm = document.getElementById("todo-form");
     let projectList = document.getElementById("project-dropdown");
+    projectList.innerHTML = "";
     for (const project of Project.instances) {
         let projectElement = document.createElement("option");
         projectElement.value = project.projectTitle;
@@ -77,21 +78,22 @@ function addTodo() {
     todoForm.classList.replace("invisible", "visible");
 }
 function submitTodo() {
-    let todoForm = document.getElementById("todo-form");
-    todoForm.classList.replace("visible", "invisible");
-    // save data logic here
     saveTodo();
-    console.log("Submitted");
+    const todoForm = document.getElementById("todo-form");
+    todoForm.classList.replace("visible", "invisible");
+    console.log("Submitted!");
 }
 function saveTodo() {
-    const todoProject = document.getElementById('project-dropdown').value;
-    const todoPriority = document.getElementById('priority-dropdown').value;
-    const todoTitle = document.querySelector('input[name="title"]').value;
-    const todoDescription = document.querySelector('input[name="description"]').value;
-    console.log("Project: " + todoProject);
-    console.log("Priority: " + todoPriority);
-    console.log("Title: " + todoTitle);
-    console.log("Description: " + todoDescription);
+    const todoProjectTitle = document.getElementById("project-dropdown").value;
+    const todoPriorityStr = document.getElementById("priority-dropdown").value;
+    const todoTitle = document.getElementById("todo-title").value;
+    const todoDescription = document.getElementById("todo-desc").value;
+    const priorityEnum = Priorities[todoPriorityStr];
+    const project = Project.instances.find((p) => p.projectTitle === todoProjectTitle);
+    const newTodo = new Todo(todoTitle.trim(), priorityEnum, project, todoDescription.trim());
+    project.addTodo(newTodo);
+    showTodos(project);
+    console.log("New Todo:", newTodo);
 }
 function cancelTodo() {
     let todoForm = document.getElementById("todo-form");
@@ -120,7 +122,7 @@ function displayTodo(todo) {
         todo.todoTitle + ((_a = todo.description) !== null && _a !== void 0 ? _a : "") + "Priority: " + Priorities[todo.priority];
     todos === null || todos === void 0 ? void 0 : todos.appendChild(singleTodo);
 }
-document.getElementById("submit-button").addEventListener('click', submitTodo);
+document.getElementById("submit-button").addEventListener("click", submitTodo);
 document.getElementById("cancel-button").addEventListener("click", cancelTodo);
 renderProjects();
 showAllTodos();
