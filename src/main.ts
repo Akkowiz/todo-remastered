@@ -1,7 +1,5 @@
 // TODO (ironic):
-// display TODOS in a nice way. make a method that takes care of the undefined strings etc...
-// when clicking on add project, open up a window where you can input stuff, submit it and make a new project
-// -> same for todos, i can use the same window
+// be able to click on todos and update / edit them :/
 // option to change the todo status for example...
 
 enum Priorities {
@@ -27,7 +25,6 @@ class Project {
     }
 
     addTodo(todo: Todo) {
-        todo.project = this;
         this.todos.push(todo);
     }
 }
@@ -45,21 +42,16 @@ class Todo {
     description?: string;
     creationDate: Date;
     priority: Priorities;
-    project: Project;
+    project: string;
     status: boolean;
 
-    public constructor(
-        title: string,
-        priority: Priorities,
-        project?: Project,
-        description?: string
-    ) {
+    public constructor(title: string, priority: Priorities, project: string, description?: string) {
         this.todoTitle = title;
         this.priority = priority;
         this.creationDate = new Date();
         this.status = false;
-        this.project = project ?? defaultProject;
         this.description = description;
+        this.project = project ?? defaultProject.projectTitle;
     }
 }
 
@@ -86,7 +78,25 @@ function renderProjects() {
         };
         projectDiv.textContent = project.projectTitle;
         projects?.appendChild(projectDiv);
-        //  + todo.description + todo.priority + todo.project + todo.creationDate
+    }
+}
+
+// TODO (hehe): implement this at other parts too!
+function getTodo(i: number) {
+    let key = localStorage.key(i);
+    let todo = localStorage.getItem(key!);
+    let todoParsed = JSON.parse(todo!);
+    return todoParsed as Todo;
+}
+
+function checkStorage() {
+    for (let i = 0; i < localStorage.length; i++) {
+        let todo = getTodo(i);
+        for (const project of Project.instances) {
+            if (project.projectTitle == todo.project) {
+                project.addTodo(todo);
+            }
+        }
     }
 }
 
@@ -128,34 +138,37 @@ function saveTodo() {
 
     const priorityEnum = Priorities[todoPriorityStr as keyof typeof Priorities];
     const project = Project.instances.find((p) => p.projectTitle === todoProjectTitle);
-
-    const newTodo = new Todo(todoTitle, priorityEnum, project, todoDescription);
+    const projectName = project?.projectTitle;
+    const newTodo = new Todo(todoTitle, priorityEnum, projectName!, todoDescription);
     project!.addTodo(newTodo);
     localStorage.setItem(newTodo.todoTitle, JSON.stringify(newTodo));
 
     showTodos(project as Project);
-    console.log("New Todo:", newTodo);
 }
 
 function cancelTodo() {
     let todoForm = document.getElementById("todo-form");
     todoForm!.classList.replace("visible", "invisible");
-    console.log("Cancelled");
 }
 
 function showAllTodos() {
     todos!.innerHTML = "";
-    for (const project of Project.instances) {
-        for (const todo of project.todos) {
-            displayTodo(todo);
-        }
+    for (let i = 0; i < localStorage.length; i++) {
+        let todo = getTodo(i);
+        displayTodo(todo);
     }
 }
 
 function showTodos(selectedProject: Project) {
     todos!.innerHTML = "";
-    for (const todo of selectedProject.todos) {
-        displayTodo(todo);
+
+    for (let i = 0; i < localStorage.length; i++) {
+        let todo = getTodo(i);
+        for (let j = 0; j < selectedProject.todos.length; j++) {
+            if (selectedProject.todos[j].todoTitle == todo.todoTitle) {
+                displayTodo(todo);
+            }
+        }
     }
 }
 
@@ -163,13 +176,14 @@ function displayTodo(todo: Todo) {
     const todoDiv = document.createElement("div");
     todoDiv.innerHTML = `<p>Title: ${todo.todoTitle}</p>
     <p>Description: ${todo.description ?? ""}</p>
-    <p>Project: ${todo.todoTitle}</p>
-    <p>Priority: ${todo.project.projectTitle}</p>
+    <p>Priority: ${Priorities[todo.priority]}</p>
     `;
     todos?.appendChild(todoDiv);
 }
-
+// break in case of emergency:
+// localStorage.clear();
 document.getElementById("submit-button")!.addEventListener("click", submitTodo);
 document.getElementById("cancel-button")!.addEventListener("click", cancelTodo);
 renderProjects();
+checkStorage();
 showAllTodos();
