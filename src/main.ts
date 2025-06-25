@@ -70,11 +70,6 @@ let defaultProject = new Project("Default");
 let projectMonday = new Project("Montag");
 let projectTuesday = new Project("Dienstag");
 
-let testTodo = new Todo("Todooo", Priorities.High, projectMonday);
-let testTodo2 = new Todo("Todooo2", Priorities.Medium);
-let testTodo4 = new Todo("überleben", Priorities.Medium, projectMonday);
-let testTodo3 = new Todo("Gassi gehen xD", Priorities.High, projectTuesday);
-
 // ========================================
 // DOM Tempering
 
@@ -121,20 +116,22 @@ function submitTodo() {
     saveTodo();
     const todoForm = document.getElementById("todo-form");
     todoForm!.classList.replace("visible", "invisible");
-    console.log("Submitted!");
 }
 
 function saveTodo() {
-    const todoProjectTitle = (document.getElementById("project-dropdown") as HTMLSelectElement).value;
-    const todoPriorityStr = (document.getElementById("priority-dropdown") as HTMLSelectElement).value;
+    const todoProjectTitle = (document.getElementById("project-dropdown") as HTMLSelectElement)
+        .value;
+    const todoPriorityStr = (document.getElementById("priority-dropdown") as HTMLSelectElement)
+        .value;
     const todoTitle = (document.getElementById("todo-title") as HTMLInputElement).value;
     const todoDescription = (document.getElementById("todo-desc") as HTMLInputElement).value;
 
     const priorityEnum = Priorities[todoPriorityStr as keyof typeof Priorities];
     const project = Project.instances.find((p) => p.projectTitle === todoProjectTitle);
 
-    const newTodo = new Todo(todoTitle.trim(), priorityEnum, project, todoDescription.trim());
+    const newTodo = new Todo(todoTitle, priorityEnum, project, todoDescription);
     project!.addTodo(newTodo);
+    localStorage.setItem(newTodo.todoTitle, JSON.stringify(newTodo));
 
     showTodos(project as Project);
     console.log("New Todo:", newTodo);
@@ -164,10 +161,12 @@ function showTodos(selectedProject: Project) {
 
 function displayTodo(todo: Todo) {
     const todoDiv = document.createElement("div");
-    const singleTodo = document.createElement("p");
-    singleTodo.textContent =
-        todo.todoTitle + (todo.description ?? "") + "Priority: " + Priorities[todo.priority];
-    todos?.appendChild(singleTodo);
+    todoDiv.innerHTML = `<p>Title: ${todo.todoTitle}</p>
+    <p>Description: ${todo.description ?? ""}</p>
+    <p>Project: ${todo.todoTitle}</p>
+    <p>Priority: ${todo.project.projectTitle}</p>
+    `;
+    todos?.appendChild(todoDiv);
 }
 
 document.getElementById("submit-button")!.addEventListener("click", submitTodo);
