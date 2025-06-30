@@ -24,15 +24,10 @@
             <label for="project-dropdown">Project:</label>
             <select name="project-dropdown" id="project-dropdown"></select>
             <br />
-
-            <!-- <input type="radio" id="high" name="priority" value="High" required />
-            <label for="high">High</label><br />
-            <input type="radio" id="medium" name="priority" value="Medium" />
-            <label for="medium">Medium</label><br />
-            <input type="radio" id="low" name="priority" value="Low" />
-            <label for="low">Low</label><br /> -->
             <button id="submit-button">Submit</button>
+            <button id="edit-button">Edit</button>
             <button id="cancel-button">Cancel</button>
+            <button class="bg-red-500" id="delete-button">Delete</button>
         </div>
         <div class="grid grid-cols-12 gap-4 m-4">
             <h1 id="headline" class="col-start-1 col-span-4 text-2xl">To Do Remastered</h1>
@@ -41,14 +36,13 @@
                     Add Project
                 </button>
                 <button class="bg-white text-black rounded m-1" onclick="addTodo()">
-                    Add Todo WIP
+                    Add Todo
                 </button>
                 <span id="all-projects" onclick="showAllTodos()">Alle Projekte</span>
                 <div id="projects" class=""></div>
             </div>
         </div>
-        <div id="todos" class="grid grid-cols-4 gap-4 m-4">
-            <!-- TODOS will load here -->
-        </div>
+        <!-- <p data-stuff="lol">xD</p> -->
+        <div id="todos" class="grid grid-cols-4 gap-4 m-4"></div>
     </body>
 </html>
