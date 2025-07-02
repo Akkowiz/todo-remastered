@@ -32,13 +32,19 @@
         <div class="grid grid-cols-12 gap-4 m-4">
             <h1 id="headline" class="col-start-1 col-span-4 text-2xl">To Do Remastered</h1>
             <div class="-white p-2 col-start-5 col-span-full">
-                <button class="bg-white text-black rounded m-1" onclick="addProject()">
+                <button class="bg-white text-black rounded m-1 p-1" onclick="addProject()">
                     Add Project
                 </button>
-                <button class="bg-white text-black rounded m-1" onclick="addTodo()">
+                <button class="bg-white text-black rounded m-1 p-1" onclick="addTodo()">
                     Add Todo
                 </button>
-                <span id="all-projects" onclick="showAllTodos()">Alle Projekte</span>
+                <button
+                    id="all-projects"
+                    class="bg-white text-black rounded m-1 p-1"
+                    onclick="showAllTodos()"
+                >
+                    Alle Projekte
+                </button>
                 <div id="projects" class=""></div>
             </div>
         </div>

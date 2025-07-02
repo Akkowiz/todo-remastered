@@ -1,11 +1,7 @@
 "use strict";
-// TODO (ironic):
-// [x] be able to click on todos and update / edit them :/
-// [x] deleting is possible too now, lit
-// [] projekte perma erstellen...
-// when editing, it shows the correct project (Dienstag) but the edited todo isnt part of it?
-// I fixed it with using checkStorage() inside SaveEditedTodo but eh
-// option to change the todo status for example...
+// ========================================
+// Classes, Enums
+// ========================================
 var Priorities;
 (function (Priorities) {
     Priorities["High"] = "High";
@@ -15,6 +11,7 @@ var Priorities;
 class Project {
     constructor(title) {
         this.todos = [];
+        this.id = Project.currentId++;
         this.projectTitle = title;
         Project.instances.push(this);
     }
@@ -22,6 +19,7 @@ class Project {
         this.todos.push(todo);
     }
 }
+Project.currentId = 100000;
 Project.instances = [];
 class Todo {
     constructor(title, priority, project, description) {
@@ -46,37 +44,77 @@ class Todo {
 Todo.currentId = 1;
 // ========================================
 // Test Daten
+// ========================================
 let defaultProject = new Project("Default");
-let projectMonday = new Project("Montag");
-let projectTuesday = new Project("Dienstag");
+defaultProject.id = 100000;
+localStorage.setItem(defaultProject.projectTitle, JSON.stringify(defaultProject));
 // ========================================
 // DOM Tempering
+// ========================================
 const projects = document.getElementById("projects");
 const todos = document.getElementById("todos");
+// ========================================
+// THE VISION
+// ========================================
 function renderProjects() {
     projects.innerHTML = "";
+    for (let i = 0; i < localStorage.length; i++) {
+        let project = getElement(i);
+        if (isProject(project)) {
+            displayProject(project);
+        }
+    }
     for (const project of Project.instances) {
-        const projectDiv = document.createElement("span");
-        projectDiv.classList = "m-1";
-        projectDiv.onclick = (event) => {
-            showTodos(project);
-        };
-        projectDiv.textContent = project.projectTitle;
-        projects === null || projects === void 0 ? void 0 : projects.appendChild(projectDiv);
     }
 }
-function getTodo(i) {
+function showAllTodos() {
+    todos.innerHTML = "";
+    for (let i = 0; i < localStorage.length; i++) {
+        let todo = getElement(i);
+        if (isTodo(todo)) {
+            displayTodo(todo);
+        }
+    }
+}
+function showTodos(selectedProject) {
+    todos.innerHTML = "";
+    for (let i = 0; i < localStorage.length; i++) {
+        let todo = getElement(i);
+        if (isTodo(todo) && todo.project == selectedProject.projectTitle) {
+            displayTodo(todo);
+        }
+    }
+}
+function getElement(i) {
     let key = localStorage.key(i);
-    let todo = localStorage.getItem(key);
-    let todoParsed = JSON.parse(todo);
-    return todoParsed;
+    let element = localStorage.getItem(key);
+    let elementParsed = JSON.parse(element);
+    if (elementParsed.id >= 100000) {
+        return elementParsed;
+    }
+    else {
+        return elementParsed;
+    }
+}
+function isTodo(obj) {
+    return obj && typeof obj === "object" && "todoTitle" in obj;
+}
+function isProject(obj) {
+    return obj && typeof obj === "object" && "projectTitle" in obj;
 }
 function checkStorage() {
     for (let i = 0; i < localStorage.length; i++) {
-        let todo = getTodo(i);
-        for (const project of Project.instances) {
-            if (project.projectTitle == todo.project) {
-                project.addTodo(todo);
+        let project = getElement(i);
+        if (isProject(project)) {
+            project = new Project(project.projectTitle);
+            for (let i = 0; i < localStorage.length; i++) {
+                let todo = getElement(i);
+                if (isTodo(todo)) {
+                    if (todo.project == project.projectTitle) {
+                        todo = new Todo(todo.todoTitle, todo.priority, todo.project, todo.description);
+                        project.addTodo(todo);
+                    }
+                }
             }
         }
     }
@@ -84,7 +122,8 @@ function checkStorage() {
 function addProject() {
     let newProject = prompt("Give your project a name", "Project XZ");
     if (newProject != null) {
-        new Project(newProject);
+        let addedProject = new Project(newProject);
+        localStorage.setItem(String(addedProject.id), JSON.stringify(addedProject));
         renderProjects();
     }
 }
@@ -98,7 +137,7 @@ function addTodo() {
     editBtn.classList.add("hidden");
     deleteBtn.classList.add("hidden");
     projectList.innerHTML = "";
-    for (const project of Project.instances) {
+    for (let project of Project.instances) {
         let projectElement = document.createElement("option");
         projectElement.value = project.projectTitle;
         projectElement.textContent = project.projectTitle;
@@ -150,6 +189,7 @@ function saveNewTodo() {
     const projectName = project === null || project === void 0 ? void 0 : project.projectTitle;
     const newTodo = new Todo(todoTitle, priorityEnum, projectName, todoDescription);
     project.addTodo(newTodo);
+    console.log("project inside saveNewTodo:", project);
     localStorage.setItem(String(newTodo.id), JSON.stringify(newTodo));
     showTodos(project);
     todoForm.classList.replace("visible", "invisible");
@@ -185,23 +225,14 @@ function cancelTodo() {
     todoForm.classList.replace("visible", "invisible");
     currentTodo = null;
 }
-function showAllTodos() {
-    todos.innerHTML = "";
-    for (let i = 0; i < localStorage.length; i++) {
-        let todo = getTodo(i);
-        displayTodo(todo);
-    }
-}
-function showTodos(selectedProject) {
-    todos.innerHTML = "";
-    for (let i = 0; i < localStorage.length; i++) {
-        let todo = getTodo(i);
-        for (let j = 0; j < selectedProject.todos.length; j++) {
-            if (selectedProject.todos[j].todoTitle == todo.todoTitle) {
-                displayTodo(todo);
-            }
-        }
-    }
+function displayProject(project) {
+    const projectDiv = document.createElement("span");
+    projectDiv.className = "m-1";
+    projectDiv.onclick = (event) => {
+        showTodos(project);
+    };
+    projectDiv.textContent = project.projectTitle;
+    projects === null || projects === void 0 ? void 0 : projects.appendChild(projectDiv);
 }
 function displayTodo(todo) {
     var _a;
@@ -227,7 +258,7 @@ document.getElementById("delete-button").addEventListener("click", () => {
     if (currentTodo)
         deleteTodo(currentTodo);
 });
-renderProjects();
 checkStorage();
+renderProjects();
 showAllTodos();
 //# sourceMappingURL=main.js.map
