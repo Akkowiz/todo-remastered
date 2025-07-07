@@ -2,7 +2,7 @@
 <html lang="en">
     <head>
         <meta charset="UTF-8" />
-        <script src="dist/main.js" defer></script>
+        <script type="module" src="dist/main.js"></script>
         <link rel="stylesheet" href="styles/output.css" />
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
         <title>To Do Remastered</title>
@@ -32,23 +32,16 @@
         <div class="grid grid-cols-12 gap-4 m-4">
             <h1 id="headline" class="col-start-1 col-span-4 text-2xl">To Do Remastered</h1>
             <div class="-white p-2 col-start-5 col-span-full">
-                <button class="bg-white text-black rounded m-1 p-1" onclick="addProject()">
+                <button id="add-project" class="bg-white text-black rounded m-1 p-1">
                     Add Project
                 </button>
-                <button class="bg-white text-black rounded m-1 p-1" onclick="addTodo()">
-                    Add Todo
-                </button>
-                <button
-                    id="all-projects"
-                    class="bg-white text-black rounded m-1 p-1"
-                    onclick="showAllTodos()"
-                >
+                <button id="add-todo" class="bg-white text-black rounded m-1 p-1">Add Todo</button>
+                <button id="all-projects" class="bg-white text-black rounded m-1 p-1">
                     Alle Projekte
                 </button>
                 <div id="projects" class=""></div>
             </div>
         </div>
-        <!-- <p data-stuff="lol">xD</p> -->
         <div id="todos" class="grid grid-cols-4 gap-4 m-4"></div>
     </body>
 </html>

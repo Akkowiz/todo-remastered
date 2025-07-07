@@ -1,61 +1,16 @@
-"use strict";
-// ========================================
-// Classes, Enums
-// ========================================
-var Priorities;
-(function (Priorities) {
-    Priorities["High"] = "High";
-    Priorities["Medium"] = "Medium";
-    Priorities["Low"] = "Low";
-})(Priorities || (Priorities = {}));
-class Project {
-    constructor(title) {
-        this.todos = [];
-        this.id = Project.currentId++;
-        this.projectTitle = title;
-        Project.instances.push(this);
-    }
-    addTodo(todo) {
-        this.todos.push(todo);
-    }
-}
-Project.currentId = 100000;
-Project.instances = [];
-class Todo {
-    constructor(title, priority, project, description) {
-        this.id = Todo.currentId++;
-        this.todoTitle = title;
-        this.priority = priority;
-        this.creationDate = new Date();
-        this.status = false;
-        this.description = description;
-        this.project = project !== null && project !== void 0 ? project : defaultProject.projectTitle;
-    }
-}
-/**
- * @param id [automatic] - to make updating / deleting todos easier
- * @param todoTitle [NEEDED!] - The title of the todo
- * @param todoDescription [optional] - the description
- * @param creationDate [automatic] - the date the todo has been created
- * @param creationDate [NEEDED!] - the date the todo has been created
- * @param project [automatic] - to which project the todo belongs to
- * @param status [automatic] - false by default, asks if the task is done or not
- */
-Todo.currentId = 1;
-// ========================================
-// Test Daten
+import { Project } from "./objects/project.js";
+import { Todo } from "./objects/todo.js";
+import { Priorities } from "./objects/priority-enums.js";
 // ========================================
 let defaultProject = new Project("Default");
 defaultProject.id = 100000;
 localStorage.setItem(defaultProject.projectTitle, JSON.stringify(defaultProject));
 // ========================================
 // DOM Tempering
-// ========================================
 const projects = document.getElementById("projects");
 const todos = document.getElementById("todos");
 // ========================================
 // THE VISION
-// ========================================
 function renderProjects() {
     projects.innerHTML = "";
     for (let i = 0; i < localStorage.length; i++) {
@@ -63,8 +18,6 @@ function renderProjects() {
         if (isProject(project)) {
             displayProject(project);
         }
-    }
-    for (const project of Project.instances) {
     }
 }
 function showAllTodos() {
@@ -189,7 +142,6 @@ function saveNewTodo() {
     const projectName = project === null || project === void 0 ? void 0 : project.projectTitle;
     const newTodo = new Todo(todoTitle, priorityEnum, projectName, todoDescription);
     project.addTodo(newTodo);
-    console.log("project inside saveNewTodo:", project);
     localStorage.setItem(String(newTodo.id), JSON.stringify(newTodo));
     showTodos(project);
     todoForm.classList.replace("visible", "invisible");
@@ -246,19 +198,26 @@ function displayTodo(todo) {
     `;
     todos === null || todos === void 0 ? void 0 : todos.appendChild(todoDiv);
 }
-// break in case of emergency:
-// localStorage.clear();
-document.getElementById("submit-button").addEventListener("click", saveNewTodo);
-document.getElementById("edit-button").addEventListener("click", () => {
-    if (currentTodo)
-        saveEditedTodo(currentTodo);
-});
-document.getElementById("cancel-button").addEventListener("click", cancelTodo);
-document.getElementById("delete-button").addEventListener("click", () => {
-    if (currentTodo)
-        deleteTodo(currentTodo);
+document.addEventListener("DOMContentLoaded", () => {
+    var _a, _b, _c, _d;
+    (_a = document.getElementById("all-projects")) === null || _a === void 0 ? void 0 : _a.addEventListener("click", showAllTodos);
+    (_b = document.getElementById("add-project")) === null || _b === void 0 ? void 0 : _b.addEventListener("click", addProject);
+    (_c = document.getElementById("add-todo")) === null || _c === void 0 ? void 0 : _c.addEventListener("click", addTodo);
+    (_d = document.querySelector("button[onclick='addProject()']")) === null || _d === void 0 ? void 0 : _d.addEventListener("click", addProject);
+    document.getElementById("submit-button").addEventListener("click", saveNewTodo);
+    document.getElementById("cancel-button").addEventListener("click", cancelTodo);
+    document.getElementById("edit-button").addEventListener("click", () => {
+        if (currentTodo)
+            saveEditedTodo(currentTodo);
+    });
+    document.getElementById("delete-button").addEventListener("click", () => {
+        if (currentTodo)
+            deleteTodo(currentTodo);
+    });
 });
 checkStorage();
 renderProjects();
 showAllTodos();
+// break in case of emergency:
+// localStorage.clear();
 //# sourceMappingURL=main.js.map
